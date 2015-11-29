@@ -68,6 +68,16 @@ token. jsmn supports the following token types:
 * String - a quoted sequence of chars, e.g.: `"foo"`
 * Primitive - a number, a boolean (`true`, `false`) or `null`
 
+Additionally, if a token represents a key, it will possess the property 
+JSMN_KEY, represented as a bitwise logical OR with the token type.  For 
+example, a token holding a string key will have type = JSMN_STRING | JSMN_KEY.
+
+This fusion of type with the JSMN_KEY property requires that all type
+comparisons be made using a logical AND operator rather than an equality test.
+For example:
+    if (token & JSMN_STRING)
+        printf("the token contains a string\n");
+
 Besides start/end positions, jsmn tokens for complex types (like arrays
 or objects) also contain a number of child items, so you can easily follow
 object hierarchy.
@@ -97,10 +107,12 @@ API
 Token types are described by `jsmntype_t`:
 
 	typedef enum {
-		JSMN_PRIMITIVE = 0,
-		JSMN_OBJECT = 1,
-		JSMN_ARRAY = 2,
-		JSMN_STRING = 3
+        JSMN_UNDEFINED = 0,
+        JSMN_OBJECT = 1,
+        JSMN_ARRAY = 2,
+        JSMN_STRING = 4,
+        JSMN_PRIMITIVE = 8,
+        JSMN_KEY = 16
 	} jsmntype_t;
 
 **Note:** Unlike JSON data types, primitive tokens are not divided into

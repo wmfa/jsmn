@@ -192,7 +192,7 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len,
 				token = &tokens[parser->toknext - 1];
 				for (;;) {
 					if (token->start != -1 && token->end == -1) {
-						if (token->type != type) {
+						if (!(token->type & type)) {
 							return JSMN_ERROR_INVAL;
 						}
 						token->end = parser->pos + 1;
@@ -208,7 +208,7 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len,
 				for (i = parser->toknext - 1; i >= 0; i--) {
 					token = &tokens[i];
 					if (token->start != -1 && token->end == -1) {
-						if (token->type != type) {
+						if (!(token->type & type)) {
 							return JSMN_ERROR_INVAL;
 						}
 						parser->toksuper = -1;
@@ -238,16 +238,18 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len,
 				break;
 			case ':':
 				parser->toksuper = parser->toknext - 1;
+				if (parser->toksuper != -1)
+					tokens[parser->toksuper].type |= JSMN_KEY;
 				break;
 			case ',':
-				if (tokens != NULL && parser->toksuper != -1 &&
-						tokens[parser->toksuper].type != JSMN_ARRAY &&
-						tokens[parser->toksuper].type != JSMN_OBJECT) {
+				if ((tokens != NULL) && (parser->toksuper != -1) &&
+					!(tokens[parser->toksuper].type & JSMN_ARRAY) &&
+					!(tokens[parser->toksuper].type & JSMN_OBJECT)) {
 #ifdef JSMN_PARENT_LINKS
 					parser->toksuper = tokens[parser->toksuper].parent;
 #else
 					for (i = parser->toknext - 1; i >= 0; i--) {
-						if (tokens[i].type == JSMN_ARRAY || tokens[i].type == JSMN_OBJECT) {
+						if ((tokens[i].type & JSMN_ARRAY) || (tokens[i].type & JSMN_OBJECT)) {
 							if (tokens[i].start != -1 && tokens[i].end == -1) {
 								parser->toksuper = i;
 								break;
@@ -265,8 +267,8 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len,
 				/* And they must not be keys of the object */
 				if (tokens != NULL && parser->toksuper != -1) {
 					jsmntok_t *t = &tokens[parser->toksuper];
-					if (t->type == JSMN_OBJECT ||
-							(t->type == JSMN_STRING && t->size != 0)) {
+					if ((t->type & JSMN_OBJECT) ||
+							((t->type & JSMN_STRING) && (t->size != 0))) {
 						return JSMN_ERROR_INVAL;
 					}
 				}

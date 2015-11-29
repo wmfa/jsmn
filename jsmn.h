@@ -18,8 +18,9 @@ typedef enum {
 	JSMN_UNDEFINED = 0,
 	JSMN_OBJECT = 1,
 	JSMN_ARRAY = 2,
-	JSMN_STRING = 3,
-	JSMN_PRIMITIVE = 4
+	JSMN_STRING = 4,
+	JSMN_PRIMITIVE = 8,
+	JSMN_KEY = 16
 } jsmntype_t;
 
 enum jsmnerr {

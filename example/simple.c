@@ -12,8 +12,8 @@ const char *JSON_STRING =
 	"\"groups\": [\"users\", \"wheel\", \"audio\", \"video\"]}";
 
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+	if ((tok->type & JSMN_STRING) && ((int) strlen(s) == tok->end - tok->start) &&
+			(strncmp(json + tok->start, s, tok->end - tok->start) == 0)) {
 		return 0;
 	}
 	return -1;
@@ -33,7 +33,7 @@ int main() {
 	}
 
 	/* Assume the top-level element is an object */
-	if (r < 1 || t[0].type != JSMN_OBJECT) {
+	if (r < 1 || !(t[0].type & JSMN_OBJECT)) {
 		printf("Object expected\n");
 		return 1;
 	}
@@ -58,7 +58,7 @@ int main() {
 		} else if (jsoneq(JSON_STRING, &t[i], "groups") == 0) {
 			int j;
 			printf("- Groups:\n");
-			if (t[i+1].type != JSMN_ARRAY) {
+			if (!(t[i+1].type & JSMN_ARRAY)) {
 				continue; /* We expect groups to be an array of strings */
 			}
 			for (j = 0; j < t[i+1].size; j++) {

@@ -29,13 +29,13 @@ static int dump(const char *js, jsmntok_t *t, size_t count, int indent) {
 	if (count == 0) {
 		return 0;
 	}
-	if (t->type == JSMN_PRIMITIVE) {
+	if (t->type & JSMN_PRIMITIVE) {
 		printf("%.*s", t->end - t->start, js+t->start);
 		return 1;
-	} else if (t->type == JSMN_STRING) {
+	} else if (t->type & JSMN_STRING) {
 		printf("'%.*s'", t->end - t->start, js+t->start);
 		return 1;
-	} else if (t->type == JSMN_OBJECT) {
+	} else if (t->type & JSMN_OBJECT) {
 		printf("\n");
 		j = 0;
 		for (i = 0; i < t->size; i++) {
@@ -46,7 +46,7 @@ static int dump(const char *js, jsmntok_t *t, size_t count, int indent) {
 			printf("\n");
 		}
 		return j+1;
-	} else if (t->type == JSMN_ARRAY) {
+	} else if (t->type & JSMN_ARRAY) {
 		j = 0;
 		printf("\n");
 		for (i = 0; i < t->size; i++) {
