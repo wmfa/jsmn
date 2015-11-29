@@ -70,11 +70,12 @@ token. jsmn supports the following token types:
 
 Additionally, if a token represents a key, it will possess the property 
 JSMN_KEY, represented as a bitwise logical OR with the token type.  For 
-example, a token holding a string key will have type = JSMN_STRING | JSMN_KEY.
+example, a token holding a string key will have `type = JSMN_STRING | JSMN_KEY`.
 
 This fusion of type with the JSMN_KEY property requires that all type
 comparisons be made using a logical AND operator rather than an equality test.
 For example:
+
     if (token & JSMN_STRING)
         printf("the token contains a string\n");
 
